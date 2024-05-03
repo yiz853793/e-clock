@@ -9,8 +9,10 @@ entity bcdcnt is
 		--时钟信号
 		QD : in std_logic;
 		--用户操作信号
+		clr: in std_logic;
+		--异步清零信号
 		mode : in std_logic_vector(1 downto 0);
-		--控制模式 mode(1) = '1' 用户控制, mode(0) = '1'时钟控制
+		--控制模式 mode(1) = '1' 用户控制
 		bcdmod : in std_logic_vector(7 downto 0);
 		--模，秒针和分针为60，时针为24
 		hh, ll : out std_logic_vector(3 downto 0);
@@ -37,7 +39,10 @@ begin
 	pulse <= (clk and mode(0)) or (QD and mode(1));
 	process(pulse)
 	begin
-		if(pulse'event and pulse = '1') then
+		if(clr = '1') then
+			tmpll <= "0000";
+			tmphh <= "0000";
+		elsif(pulse'event and pulse = '1') then
 			tmpll <= tmpll + 1;
 			if(tmpll = "1001") then
 				tmphh <= tmphh + 1;

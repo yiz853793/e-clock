@@ -69,6 +69,9 @@ signal t_hourh, t_hourl, t_minh, t_minl, t_sech, t_secl : std_logic_vector(3 dow
 signal a_hourh, a_hourl, a_minh, a_minl, a_sech, a_secl : std_logic_vector(3 downto 0);
 --闹钟信息
 
+signal tmp_hourh, tmp_hourl, tmp_minh, tmp_minl, tmp_sech, tmp_secl : std_logic_vector(3 downto 0);
+--存储器信息
+
 signal scarry : std_logic;
 --秒到分的进位
 
@@ -150,30 +153,79 @@ begin
 	secl2light:  bcd2light port map(light_secl, light_seclbcd);
 	--七段显示译码模块，用于将秒钟个位译码为七段译码
 
+	--存储器写入
+	--show_alert = '1'时存入闹钟信息，否则存入时钟信息
+	with show_alert select
+	tmp_hourh <= a_hourh when '1',
+				t_hourh when others;
+	--存入时针高四位
+
+	with show_alert select
+	tmp_hourl <= a_hourl when '1',
+				t_hourl when others;
+	--存入时针低四位
+
+	with show_alert select
+	tmp_minh <= a_minh when '1',
+				t_minh when others;
+	--存入分针高四位
+
+	with show_alert select
+	tmp_minl <= a_minl when '1',
+				t_minl when others;
+	--存入分针低四位
+
+	with show_alert select
+	tmp_sech <= a_sech when '1',
+				t_sech when others;
+	--存入秒针高四位
+
+	with show_alert select
+	tmp_secl <= a_secl when '1',
+				t_secl when others;
+	--存入秒针低四位
+		
+
 	--显示模块
-	sec_display: num_display port map(not sec and mode(1), t_sech, t_secl, light_sech, light_secl);
+	sec_display: num_display port map(not sec and mode(1), tmp_sech, tmp_secl, light_sech, light_secl);
 	--显示秒针，mode(1) = '1'时调整秒针，秒针闪烁
 	
-	min_display: num_display port map(not sec and mode(2), t_minh, t_minl, light_minh, light_minl);
+	min_display: num_display port map(not sec and mode(2), tmp_minh, tmp_minl, light_minh, light_minl);
 	--显示分针，mode(2) = '1'时调整分针，分针闪烁
 
-	hour_display: num_display port map(not sec and mode(3), t_hourh, t_hourl, light_hourh, light_hourl);
+	hour_display: num_display port map(not sec and mode(3), tmp_hourh, tmp_hourl, light_hourh, light_hourl);
 	--显示时针，mode(3) = '1'时调整时针，时针闪烁
 
-	--计时模块
-	sec_incr: bcdcnt port map(sec, myop, mode(1) & mode(0), sixty, t_sech, t_secl, scarry);
+	--时钟计时模块 show_alert = '0' 有效
+	sec_incr: 
+		bcdcnt port map(sec, myop, (mode(1) and not show_alert) & (mode(0) or show_alert), sixty, t_sech, t_secl, scarry);
 	--秒针计时
 	--mode(1) = '1'QD调整，mode(0) = '1'sec调整
 
-	min_incr: bcdcnt port map(scarry, myop, mode(2)&mode(0), sixty, t_minh, t_minl, mcarry);
+	min_incr: 
+		bcdcnt port map(scarry, myop, (mode(2) and not show_alert) & (mode(0) or show_alert), sixty, t_minh, t_minl, mcarry);
 	--分针计时
 	--mode(2) = '1'QD调整，mode(0) = '1'sec调整
 
-	hour_incr: bcdcnt port map(mcarry, myop, mode(3)&mode(0), tw_fo, t_hourh, t_hourl, null_and_void(9));
+	hour_incr: 
+		bcdcnt port map(mcarry, myop, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void(0));
 	--时针计时
 	--mode(3) = '1'QD调整，mode(0) = '1'sec调整
+	
+	--闹钟设置模块
+	asec_incr: 
+		bcdcnt port map('0', myop, (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void(1));
+	--mode(1) = '1', show_alert = '1'，QD调整秒针
 
-	isspark <= mcarry;
+	amin_incr: 
+		bcdcnt port map('0', myop, (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void(2));
+	--mode(2) = '1', show_alert = '1'，QD调整分针
+
+	ahour_incr: bcdcnt port map('0', myop, (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void(3));
+	--mode(3) = '1', show_alert = '1'，QD调整时针
+
+	isspark <= '1' when (mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
+	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl);
 	--蜂蜜器信号
 
 end clock_bh;

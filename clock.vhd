@@ -57,6 +57,7 @@ architecture clock_bh of clock is
 
 constant sixty : std_logic_vector(7 downto 0) := "01011001";   -- 59
 constant tw_fo : std_logic_vector(7 downto 0) := "00100011"; -- 23
+constant low_divider: integer := 16;  -- 32分频
 
 signal sec: std_logic;
 --1hz时钟信号
@@ -87,6 +88,12 @@ signal isspark: std_logic;
 
 signal null_and_void : std_logic_vector(3 downto 0);
 --多余信号
+
+signal enlow, enhigh : std_logic;
+-- 低音和高音信号
+
+signal alr1, alr2: std_logic;
+--蜂鸣器暂存
 
 --分频模块
 component f2sec is
@@ -139,13 +146,35 @@ component bcdcnt is
 		--控制模式 mode(1) = '1' 用户控制
 		bcdmod : in std_logic_vector(7 downto 0);
 		--模，秒针和分针为60，时针为24
-		hh, ll : out std_logic_vector(3 downto 0);
+		hh, ll : inout std_logic_vector(3 downto 0);
 		--输出的高四位和第四位
 		carry : out std_logic
 		--进位信号
 	);
 end component;
 
+component ring is 
+	    port(
+        enable: in std_logic; 
+		  -- 响铃使能
+        clk: in std_logic;
+        --1Hz时钟信号
+        enlow: out std_logic;
+        --低音C使能信号，高电平有效
+        enhigh: out std_logic
+        --高音C使能信号，高电平有效
+    );
+end component;
+
+component dividerOfRing is 
+	port(
+		highFre: in std_logic;	--原始时钟频率
+		enable: in std_logic; --使能信号
+		clr: in std_logic; -- 异步清零
+		N : in integer;  --分频大小
+		newFre: out std_logic -- 分频后时钟频率
+	);
+end component;
 
 begin
 	nsec: f2sec port map (f10k, sec);
@@ -235,6 +264,15 @@ begin
 		mcarry;
 	--蜂鸣器信号
 	
+	ring_alert: ring port map(isspark, sec, enlow, enhigh);
+	-- 响铃模块
 	
+	low_frec : dividerOfRing port map(f10k, enlow, clr, low_divider, alr1);
+	--低音
+	
+	high_frec : dividerOfRing port map(f10k, enhigh, clr, (low_divider / 2), alr2);
+	--高音
+	
+	alr <= alr1 or alr2;
 end clock_bh;
 

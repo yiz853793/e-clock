@@ -9,8 +9,8 @@ entity bcdcnt is
 		--时钟信号
 		QD : in std_logic;
 		--用户操作信号
-		mode : in std_logic;
-		--控制模式 mode = '1' 用户控制，否则时钟控制
+		mode : in std_logic_vector(1 downto 0);
+		--控制模式 mode(1) = '1' 用户控制
 		bcdmod : in std_logic_vector(7 downto 0);
 		--模，秒针和分针为60，时针为24
 		hh, ll : out std_logic_vector(3 downto 0);
@@ -34,7 +34,7 @@ signal pulse: std_logic;
 --end component;
 begin
 --	compound: xor_gate port map(clk, QD and mode, pulse);
-	pulse <= (clk and not mode) or (QD and mode);
+	pulse <= (clk and mode(0)) or (QD and mode(1));
 	process(pulse)
 	begin
 		if(pulse'event and pulse = '1') then

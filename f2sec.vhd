@@ -14,16 +14,13 @@ end f2sec;
 
 architecture f2sec_bh of f2sec is
 
-signal tmp_sec : integer;
+signal tmp_sec : integer range 0 to 9999;
 
 begin
 	process(clk)
 	begin
 		if(clk'event and clk = '1') then
 			tmp_sec <= tmp_sec + 1;
-			if(tmp_sec >= 10000) then
-				tmp_sec <= 0;
-			end if;
 		end if;
 		if(tmp_sec < 2000) then
 			nsec <= '1';

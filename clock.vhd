@@ -63,6 +63,9 @@ signal myop, clr, show_alert : std_logic;
 signal set_mode: std_logic_vector(1 downto 0);
 --防抖动
 
+signal f50 : std_logic;
+--50Hz
+
 signal sec: std_logic;
 --1hz时钟信号
 
@@ -117,6 +120,13 @@ component f2sec is
 		--10khz时钟信号
 		nsec: out std_logic
 		--秒
+	);
+end component;
+
+component f2f is
+	port(
+		clk:in std_logic; --10kHz
+		f50:out std_logic --50Hz
 	);
 end component;
 
@@ -192,20 +202,21 @@ component dividerOfRing is
 end component;
 
 begin
+	f10k_to_50: f2f port map(f10k, f50);
 	--防抖动模块
-	QD_db: button port map(f10k, amyop, myop);
+	QD_db: button port map(f50, amyop, myop);
 	--QD防抖动
 	
-	clr_db:button port map(f10k, aclr, clr);
+	clr_db:button port map(f50, aclr, clr);
 	--clr防抖动
 	
-	sa_db: button port map(f10k, ashow_alert, show_alert);
+	sa_db: button port map(f50, ashow_alert, show_alert);
 	--show_alert防抖动
 	
-	st_db1:button port map(f10k, aset_mode(1), set_mode(1));
+	st_db1:button port map(f50, aset_mode(1), set_mode(1));
 	--mode(1)防抖动
 	
-	st_db2:button port map(f10k, aset_mode(0), set_mode(0)); 
+	st_db2:button port map(f50, aset_mode(0), set_mode(0)); 
 	--mode(0)防抖动
 	
 	nsec: f2sec port map (f10k, sec);
@@ -306,3 +317,4 @@ begin
 	
 	alr <= alr1 or alr2;
 end clock_bh;
+

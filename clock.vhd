@@ -13,19 +13,19 @@ entity clock is
 		--主时钟
 		--MF 55 1Mhz
 
-		myop : in std_logic;
+		amyop : in std_logic;
 		--调节控制信号，上升沿触发
 		--QD 60
 		
-		clr : in std_logic;
+		aclr : in std_logic;
 		--异步清零信号
 		--K15 63
 		
-		show_alert: in std_logic;
+		ashow_alert: in std_logic;
 		--显示闹钟界面
 		--swa 4
 
-		set_mode: in std_logic_vector(1 downto 0);
+		aset_mode: in std_logic_vector(1 downto 0);
 		--设置模式
 		--"00" 正常 "01"设置秒针 "10"设置分针 "11"设置时针
 		--swb 5 swb 6
@@ -58,6 +58,10 @@ architecture clock_bh of clock is
 constant sixty : std_logic_vector(7 downto 0) := "01011001";   -- 59
 constant tw_fo : std_logic_vector(7 downto 0) := "00100011"; -- 23
 constant low_divider: integer := 16;  -- 32分频
+
+signal myop, clr, show_alert : std_logic;
+signal set_mode: std_logic_vector(1 downto 0);
+--防抖动
 
 signal sec: std_logic;
 --1hz时钟信号
@@ -94,6 +98,17 @@ signal enlow, enhigh : std_logic;
 
 signal alr1, alr2: std_logic;
 --蜂鸣器暂存
+
+--防抖动模块
+component button is
+	port(
+		clk:in std_logic; --这里频率使用10kHz
+		input:in std_logic;
+		--开关抖动状态
+		output:out std_logic
+		-- 按键防抖后的判断结果
+	);
+end component;
 
 --分频模块
 component f2sec is
@@ -177,6 +192,22 @@ component dividerOfRing is
 end component;
 
 begin
+	--防抖动模块
+	QD_db: button port map(f10k, amyop, myop);
+	--QD防抖动
+	
+	clr_db:button port map(f10k, aclr, clr);
+	--clr防抖动
+	
+	sa_db: button port map(f10k, ashow_alert, show_alert);
+	--show_alert防抖动
+	
+	st_db1:button port map(f10k, aset_mode(1), set_mode(1));
+	--mode(1)防抖动
+	
+	st_db2:button port map(f10k, aset_mode(0), set_mode(0)); 
+	--mode(0)防抖动
+	
 	nsec: f2sec port map (f10k, sec);
 	--分频模块
 	--将10khz的方波转化成1hz空占比为0.8的方波
@@ -275,4 +306,3 @@ begin
 	
 	alr <= alr1 or alr2;
 end clock_bh;
-

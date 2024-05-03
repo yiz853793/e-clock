@@ -16,7 +16,11 @@ entity clock is
 		myop : in std_logic;
 		--调节控制信号，上升沿触发
 		--QD 60
-
+		
+		clr : in std_logic;
+		--异步清零信号
+		--K15 63
+		
 		show_alert: in std_logic;
 		--显示闹钟界面
 		--swa 4
@@ -81,7 +85,7 @@ signal mcarry : std_logic;
 signal isspark: std_logic;
 --整点和闹钟报时信号
 
-signal null_and_void : std_logic_vector(9 downto 0);
+signal null_and_void : std_logic_vector(3 downto 0);
 --多余信号
 
 --分频模块
@@ -129,6 +133,8 @@ component bcdcnt is
 		--时钟信号
 		QD : in std_logic;
 		--用户操作信号
+		clr: in std_logic;
+		--异步清零信号
 		mode : in std_logic_vector(1 downto 0);
 		--控制模式 mode(1) = '1' 用户控制
 		bcdmod : in std_logic_vector(7 downto 0);
@@ -198,36 +204,37 @@ begin
 
 	--时钟计时模块 show_alert = '0' 有效
 	sec_incr: 
-		bcdcnt port map(sec, myop, (mode(1) and not show_alert) & (mode(0) or show_alert), sixty, t_sech, t_secl, scarry);
+		bcdcnt port map(sec, myop, clr and not show_alert, (mode(1) and not show_alert) & (mode(0) or show_alert), sixty, t_sech, t_secl, scarry);
 	--秒针计时
 	--mode(1) = '1'QD调整，mode(0) = '1'sec调整
 
 	min_incr: 
-		bcdcnt port map(scarry, myop, (mode(2) and not show_alert) & (mode(0) or show_alert), sixty, t_minh, t_minl, mcarry);
+		bcdcnt port map(scarry, myop, clr and not show_alert, (mode(2) and not show_alert) & (mode(0) or show_alert), sixty, t_minh, t_minl, mcarry);
 	--分针计时
 	--mode(2) = '1'QD调整，mode(0) = '1'sec调整
 
 	hour_incr: 
-		bcdcnt port map(mcarry, myop, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void(0));
+		bcdcnt port map(mcarry, myop, clr and not show_alert, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void(0));
 	--时针计时
 	--mode(3) = '1'QD调整，mode(0) = '1'sec调整
 	
 	--闹钟设置模块
 	asec_incr: 
-		bcdcnt port map('0', myop, (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void(1));
+		bcdcnt port map('0', myop, clr and show_alert, (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void(1));
 	--mode(1) = '1', show_alert = '1'，QD调整秒针
 
 	amin_incr: 
-		bcdcnt port map('0', myop, (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void(2));
+		bcdcnt port map('0', myop, clr and show_alert, (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void(2));
 	--mode(2) = '1', show_alert = '1'，QD调整分针
 
-	ahour_incr: bcdcnt port map('0', myop, (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void(3));
+	ahour_incr: bcdcnt port map('0', myop, clr and show_alert, (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void(3));
 	--mode(3) = '1', show_alert = '1'，QD调整时针
 
 	isspark <= '1' when (mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
 	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl) else
 		mcarry;
-	--蜂蜜器信号
-
+	--蜂鸣器信号
+	
+	
 end clock_bh;
 

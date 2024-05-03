@@ -39,17 +39,17 @@ begin
 	begin
 		if(pulse'event and pulse = '1') then
 			tmpll <= tmpll + 1;
-			if(tmpll >= "1010") then
+			if(tmpll = "1001") then
 				tmphh <= tmphh + 1;
 				tmpll <= "0000";
 			end if;
-		end if;
-		if(tmphh & tmpll >= bcdmod) then
-			tmphh <= "0000";
-			tmpll <= "0000";
-			carry <= '1';
-		else
-			carry <= '0';
+			if(tmphh & tmpll = bcdmod) then
+				tmphh <= "0000";
+				tmpll <= "0000";
+				carry <= '1';
+			else
+				carry <= '0';
+			end if;
 		end if;
 	end process;
 	hh <= tmphh;

@@ -15,7 +15,7 @@ entity bcdcnt is
 		--控制模式 mode(1) = '1' 用户控制
 		bcdmod : in std_logic_vector(7 downto 0);
 		--模，秒针和分针为60，时针为24
-		hh, ll : out std_logic_vector(3 downto 0);
+		hh, ll : inout std_logic_vector(3 downto 0);
 		--输出的高四位和第四位
 		carry : out std_logic
 		--进位信号
@@ -23,7 +23,6 @@ entity bcdcnt is
 end bcdcnt;
 
 architecture bcdcnt_bh of bcdcnt is
-signal tmphh, tmpll : std_logic_vector(3 downto 0) := "0000";
 signal pulse: std_logic;
 
 --component xor_gate is
@@ -40,23 +39,21 @@ begin
 	process(pulse)
 	begin
 		if(clr = '1') then
-			tmpll <= "0000";
-			tmphh <= "0000";
+			ll <= "0000";
+			hh <= "0000";
 		elsif(pulse'event and pulse = '1') then
-			tmpll <= tmpll + 1;
-			if(tmpll = "1001") then
-				tmphh <= tmphh + 1;
-				tmpll <= "0000";
+			ll <= ll + 1;
+			if(ll = "1001") then
+				hh <= hh + 1;
+				ll <= "0000";
 			end if;
-			if(tmphh & tmpll = bcdmod) then
-				tmphh <= "0000";
-				tmpll <= "0000";
+			if(hh & ll = bcdmod) then
+				hh <= "0000";
+				ll <= "0000";
 				carry <= '1';
 			else
 				carry <= '0';
 			end if;
 		end if;
 	end process;
-	hh <= tmphh;
-	ll <= tmpll;
 end bcdcnt_bh;

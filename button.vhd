@@ -13,11 +13,14 @@ entity button is
 end button;
 
 architecture button_ah of button is
+signal tmp1, tmp2 : std_logic;
 begin
 	process(clk,input)
 	begin
 		if (clk'event and clk='1') then 
-			output <= input;
+			tmp1 <= input;
+			tmp2 <= tmp1;
 		end if;
 	end process;
+	output <= tmp1 and tmp2;
 end button_ah;

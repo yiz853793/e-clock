@@ -10,7 +10,7 @@ entity bcdcnt is
 		QD : in std_logic;
 		--用户操作信号
 		mode : in std_logic_vector(1 downto 0);
-		--控制模式 mode(1) = '1' 用户控制
+		--控制模式 mode(1) = '1' 用户控制, mode(0) = '1'时钟控制
 		bcdmod : in std_logic_vector(7 downto 0);
 		--模，秒针和分针为60，时针为24
 		hh, ll : out std_logic_vector(3 downto 0);

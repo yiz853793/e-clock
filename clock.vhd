@@ -4,7 +4,10 @@ use ieee.std_logic_unsigned.all;
 
 entity clock is
 	port(
-		f5k, f1Mk, myop, show_alert: in std_logic;
+		f10k : in std_logic;
+		f1Mk : in std_logic;
+		myop : in std_logic;
+		show_alert: in std_logic;
 		set_mode: in std_logic_vector(1 downto 0);
 		alr: out std_logic;
 		light_hourh, light_hourl: out std_logic_vector(3 downto 0);
@@ -16,10 +19,11 @@ end clock;
 
 architecture clock_bh of clock is
 
-constant sixty : std_logic_vector(7 downto 0) := "01100000";
-constant tw_fo : std_logic_vector(7 downto 0) := "00100100";
+constant sixty : std_logic_vector(7 downto 0) := "01011001";
+constant tw_fo : std_logic_vector(7 downto 0) := "00100011";
 signal mode : std_logic_vector(3 downto 0);
-signal t_hourh, t_hourl, t_minh, t_minl, t_sech, t_secl, light_secl : std_logic_vector(3 downto 0);
+signal light_secl : std_logic_vector(3 downto 0);
+signal t_hourh, t_hourl, t_minh, t_minl, t_sech, t_secl : std_logic_vector(3 downto 0);
 signal s2m, m2h : std_logic;
 signal sec: std_logic;
 signal isspark: std_logic;
@@ -58,7 +62,7 @@ end component;
 component bcdcnt is
 	port(
 		clk, QD: in std_logic;
-		mode : in std_logic;
+		mode : in std_logic_vector(1 downto 0);
 		bcdmod : in std_logic_vector(7 downto 0);
 		hh, ll : out std_logic_vector(3 downto 0);
 		carry : out std_logic
@@ -66,23 +70,21 @@ component bcdcnt is
 end component;
 
 begin
-	nsec: f2sec port map (f5k, sec);
+	nsec: f2sec port map (f10k, sec);
 	
 	decide_mode: encode24 port map(set_mode, mode);
 	
 	secl2light: 
 		bcd2light port map(light_secl, light_seclbcd);
 	
-	--tmp <= time when ... else alert;
-	
 	sec_display: num_display port map(not sec and mode(1), t_sech, t_secl, light_sech, light_secl);
 	min_display: num_display port map(not sec and mode(2), t_minh, t_minl, light_minh, light_minl);
 	hour_display: num_display port map(not sec and mode(3), t_hourh, t_hourl, light_hourh, light_hourl);
-	
-	sec_incr: bcdcnt port map(sec, myop, mode(1), sixty, t_sech, t_secl, scarry);
-	min_incr: bcdcnt port map(scarry, myop, mode(2), sixty, t_minh, t_minl, mcarry);
-	hour_incr: bcdcnt port map(mcarry, myop, mode(3), tw_fo, t_hourh, t_hourl, null_and_void(9));
 
+	sec_incr: bcdcnt port map(sec, myop, mode(1) & mode(0), sixty, t_sech, t_secl, scarry);
+	min_incr: bcdcnt port map(scarry, myop, mode(2) & mode(0), sixty, t_minh, t_minl, mcarry);
+	hour_incr: bcdcnt port map(mcarry, myop, mode(3) & mode(0), tw_fo, t_hourh, t_hourl, null_and_void(9));
+	
 	isspark <= mcarry;
 end clock_bh;
 

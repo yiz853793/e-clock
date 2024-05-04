@@ -8,7 +8,11 @@ entity clock is
 		f1k : in std_logic;
 		--时钟信号 1khz
       		 --CP2 57 IN 1KHz或100Hz
-
+		
+		f10: in std_logic;
+		--时钟信号 10hz
+      		 --CP3 58 IN 1Hz或10Hz
+		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
 		--QD 60
@@ -215,7 +219,7 @@ begin
 	st_db2:button port map(f50, aset_mode(0), set_mode(0)); 
 	--mode(0)防抖动
 	
-	nsec: f2sec port map (f1k, sec);
+	nsec: f2sec port map (f10, sec);
 	--分频模块
 	--将10khz的方波转化成1hz空占比为0.8的方波
 	

@@ -6,7 +6,7 @@ use ieee.std_logic_signed.all;
 -- 进行分频
 entity dividerOfRing is
 	port(
-		highFre: in std_logic;	--原始时钟频率
+		highFre: in std_logic;	--原始时钟频率1khz
 		enable: in std_logic; --使能信号
 		clr: in std_logic; -- 异步清零
 		N : in integer;  --分频大小
@@ -15,10 +15,10 @@ entity dividerOfRing is
 end entity;
 
 architecture behavioral of dividerOfRing is
-signal ClkCnt : integer range 0 to 15;
+signal ClkCnt : integer range 0 to 1;
 signal CLK : std_logic := '0';
 begin
-    process(highFre)
+    process(highFre, enable, clr)
     begin
 		if(enable = '1') then
 			if (clr = '1') then

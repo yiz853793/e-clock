@@ -10,8 +10,6 @@ entity clock is
       		 --CP2 57 IN 1KHz或100Hz
 		
 		f10: in std_logic;
-		--时钟信号 10hz
-      		 --CP3 58 IN 1Hz或10Hz
 		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
@@ -93,7 +91,7 @@ signal mcarry : std_logic;
 signal isspark: std_logic;
 --整点和闹钟报时信号
 
-signal null_and_void : std_logic_vector(3 downto 0);
+signal null_and_void : std_logic;
 --多余信号
 
 signal enlow, enhigh : std_logic;
@@ -197,7 +195,7 @@ component dividerOfRing is
 		enable: in std_logic; --使能信号
 		clr: in std_logic; -- 异步清零
 		N : in integer;  --分频大小
-		newFre: out std_logic -- 分频后时钟频率
+		newFre: inout std_logic -- 分频后时钟频率
 	);
 end component;
 
@@ -285,20 +283,20 @@ begin
 	--mode(2) = '1'QD调整，mode(0) = '1'sec调整
 
 	hour_incr: 
-		bcdcnt port map(mcarry, myop, clr, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void(0));
+		bcdcnt port map(mcarry, myop, clr, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void);
 	--时针计时
 	--mode(3) = '1'QD调整，mode(0) = '1'sec调整
 	
 	--闹钟设置模块
 	asec_incr: 
-		bcdcnt port map('0', myop, '0', (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void(1));
+		bcdcnt port map('0', myop, '0', (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void);
 	--mode(1) = '1', show_alert = '1'，QD调整秒针
 
 	amin_incr: 
-		bcdcnt port map('0', myop, '0', (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void(2));
+		bcdcnt port map('0', myop, '0', (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void);
 	--mode(2) = '1', show_alert = '1'，QD调整分针
 
-	ahour_incr: bcdcnt port map('0', myop, '0', (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void(3));
+	ahour_incr: bcdcnt port map('0', myop, '0', (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void);
 	--mode(3) = '1', show_alert = '1'，QD调整时针
 
 	isspark <= '1' when (mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh

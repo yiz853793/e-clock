@@ -15,6 +15,7 @@ entity bcdcnt is
 		--控制模式 mode(1) = '1' 用户控制
 		bcdmod : in std_logic_vector(7 downto 0);
 		--模，秒针和分针为60，时针为24
+		zero : in std_logic_vector(3 downto 0);
 		hh, ll : inout std_logic_vector(3 downto 0);
 		--输出的高四位和第四位
 		carry : out std_logic
@@ -39,17 +40,17 @@ begin
 	process(pulse)
 	begin
 		if(clr = '1') then
-			ll <= "0000";
-			hh <= "0000";
+			ll <= zero;
+			hh <= zero;
 		elsif(pulse'event and pulse = '1') then
 			ll <= ll + 1;
 			if(ll = "1001") then
 				hh <= hh + 1;
-				ll <= "0000";
+				ll <= zero;
 			end if;
 			if(hh & ll = bcdmod) then
-				hh <= "0000";
-				ll <= "0000";
+				hh <= zero;
+				ll <= zero;
 				carry <= '1';
 			else
 				carry <= '0';

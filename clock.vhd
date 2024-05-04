@@ -275,30 +275,30 @@ begin
 
 	--时钟计时模块 show_alert = '0' 有效
 	sec_incr: 
-		bcdcnt port map(sec, myop, clr and not show_alert, (mode(1) and not show_alert) & (mode(0) or show_alert), sixty, t_sech, t_secl, scarry);
+		bcdcnt port map(sec, myop, clr, (mode(1) and not show_alert) & (mode(0) or show_alert), sixty, t_sech, t_secl, scarry);
 	--秒针计时
 	--mode(1) = '1'QD调整，mode(0) = '1'sec调整
 
 	min_incr: 
-		bcdcnt port map(scarry, myop, clr and not show_alert, (mode(2) and not show_alert) & (mode(0) or show_alert), sixty, t_minh, t_minl, mcarry);
+		bcdcnt port map(scarry, myop, clr, (mode(2) and not show_alert) & (mode(0) or show_alert), sixty, t_minh, t_minl, mcarry);
 	--分针计时
 	--mode(2) = '1'QD调整，mode(0) = '1'sec调整
 
 	hour_incr: 
-		bcdcnt port map(mcarry, myop, clr and not show_alert, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void(0));
+		bcdcnt port map(mcarry, myop, clr, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, t_hourh, t_hourl, null_and_void(0));
 	--时针计时
 	--mode(3) = '1'QD调整，mode(0) = '1'sec调整
 	
 	--闹钟设置模块
 	asec_incr: 
-		bcdcnt port map('0', myop, clr and show_alert, (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void(1));
+		bcdcnt port map('0', myop, '0', (mode(1) and show_alert) & '0', sixty, a_sech, a_secl, null_and_void(1));
 	--mode(1) = '1', show_alert = '1'，QD调整秒针
 
 	amin_incr: 
-		bcdcnt port map('0', myop, clr and show_alert, (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void(2));
+		bcdcnt port map('0', myop, '0', (mode(2) and show_alert) & '0', sixty, a_minh, a_minl, null_and_void(2));
 	--mode(2) = '1', show_alert = '1'，QD调整分针
 
-	ahour_incr: bcdcnt port map('0', myop, clr and show_alert, (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void(3));
+	ahour_incr: bcdcnt port map('0', myop, '0', (mode(3) and show_alert) & '0', tw_fo, a_hourh, a_hourl, null_and_void(3));
 	--mode(3) = '1', show_alert = '1'，QD调整时针
 
 	isspark <= '1' when (mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh

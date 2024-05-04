@@ -5,13 +5,9 @@ use ieee.std_logic_unsigned.all;
 
 entity clock is
 	port(
-		f10k : in std_logic;
-		--时钟信号 10khz
-      		 --CP1 56 IN 100KHz或10KHz
-
-		f1Mk : in std_logic;
-		--主时钟
-		--MF 55 1Mhz
+		f1k : in std_logic;
+		--时钟信号 1khz
+      		 --CP2 57 IN 1KHz或100Hz
 
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
@@ -57,7 +53,7 @@ architecture clock_bh of clock is
 
 constant sixty : std_logic_vector(7 downto 0) := "01011001";   -- 59
 constant tw_fo : std_logic_vector(7 downto 0) := "00100011"; -- 23
-constant low_divider: integer := 16;  -- 32分频
+constant low_divider: integer := 2;  -- 4分频
 
 signal myop, clr, show_alert : std_logic;
 signal set_mode: std_logic_vector(1 downto 0);
@@ -202,7 +198,7 @@ component dividerOfRing is
 end component;
 
 begin
-	f10k_to_50: f2f port map(f10k, f50);
+	f10k_to_50: f2f port map(f1k, f50);
 	--防抖动模块
 	QD_db: button port map(f50, amyop, myop);
 	--QD防抖动
@@ -219,7 +215,7 @@ begin
 	st_db2:button port map(f50, aset_mode(0), set_mode(0)); 
 	--mode(0)防抖动
 	
-	nsec: f2sec port map (f10k, sec);
+	nsec: f2sec port map (f1k, sec);
 	--分频模块
 	--将10khz的方波转化成1hz空占比为0.8的方波
 	
@@ -309,10 +305,10 @@ begin
 	ring_alert: ring port map(isspark, sec, enlow, enhigh);
 	-- 响铃模块
 	
-	low_frec : dividerOfRing port map(f10k, enlow, clr, low_divider, alr1);
+	low_frec : dividerOfRing port map(f1k, enlow, clr, low_divider, alr1);
 	--低音
 	
-	high_frec : dividerOfRing port map(f10k, enhigh, clr, (low_divider / 2), alr2);
+	high_frec : dividerOfRing port map(f1k, enhigh, clr, (low_divider / 2), alr2);
 	--高音
 	
 	alr <= alr1 or alr2;

@@ -1,4 +1,4 @@
---f2sec将10khz的方波转化成1hz空占比为0.8的方波
+--f2sec将10hz的方波转化成1hz空占比为0.8的方波
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;

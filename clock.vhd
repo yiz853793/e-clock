@@ -10,6 +10,8 @@ entity clock is
       		 --CP2 57 IN 1KHz或100Hz
 		
 		f10: in std_logic;
+		--10Hz
+		--CP3 58
 		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发

@@ -10,8 +10,6 @@ entity clock is
       		 --CP2 57 IN 1KHz或100Hz
 		
 		f10: in std_logic;
-		--时钟信号 10hz
-		--CP3 58
 		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
@@ -20,6 +18,10 @@ entity clock is
 		aclr : in std_logic;
 		--异步清零信号
 		--K15 63
+		
+		en_clock: in std_logic;
+		--
+		--K14 64
 		
 		ashow_alert: in std_logic;
 		--显示闹钟界面
@@ -205,7 +207,7 @@ component dividerOfRing is
 end component;
 
 begin
-	f1k_to_50: f2f port map(f1k, f50);
+	f10k_to_50: f2f port map(f1k, f50);
 	--防抖动模块
 	QD_db: button port map(f50, amyop, myop);
 	--QD防抖动
@@ -304,7 +306,7 @@ begin
 	ahour_incr: bcdcnt port map('0', myop, '0', (mode(3) and show_alert) & '0', tw_fo, zero, a_hourh, a_hourl, null_and_void);
 	--mode(3) = '1', show_alert = '1'，QD调整时针
 
-	isspark <= '1' when (mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
+	isspark <= '1' when (en_clock = '1' and mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
 	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl) else
 		mcarry and scarry;
 	--蜂鸣器信号
@@ -320,3 +322,4 @@ begin
 	
 	alr <= alr1 or alr2;
 end clock_bh;
+

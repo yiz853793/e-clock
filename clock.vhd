@@ -10,6 +10,8 @@ entity clock is
       		 --CP2 57 IN 1KHz或100Hz
 		
 		f10: in std_logic;
+		--时钟信号 10hz
+		--CP3 58
 		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
@@ -203,7 +205,7 @@ component dividerOfRing is
 end component;
 
 begin
-	f10k_to_50: f2f port map(f1k, f50);
+	f1k_to_50: f2f port map(f1k, f50);
 	--防抖动模块
 	QD_db: button port map(f50, amyop, myop);
 	--QD防抖动

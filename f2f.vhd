@@ -16,10 +16,13 @@ begin
 	begin
 		if (clk'event and clk='1') then 
 			cnt <= cnt + 1;
-			if cnt = 0 then 
+			if (cnt = 0) then 
 				f50 <= '1';
 			else
 				f50 <= '0';
+			end if;
+			if (cnt = 19) then 
+				cnt <= 0;
 			end if;
 		end if;
 	end process;

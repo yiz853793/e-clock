@@ -1,4 +1,4 @@
---f2sec将10hz的方波转化成1hz空占比为0.8的方波
+--f2sec将10khz的方波转化成1hz空占比为0.2的方波
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
@@ -21,11 +21,15 @@ begin
 	begin
 		if(clk'event and clk = '1') then
 			tmp_sec <= tmp_sec + 1;
+			if(tmp_sec = 9) then
+				tmp_sec <= 0;
+			end if;
+			if(tmp_sec < 8) then
+				nsec <= '1';
+			else
+				nsec <= '0';
+			end if;
 		end if;
-		if(tmp_sec < 2) then
-			nsec <= '1';
-		else
-			nsec <= '0';
-		end if;
+
 	end process;
 end f2sec_bh;

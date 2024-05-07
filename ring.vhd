@@ -21,25 +21,25 @@ architecture behavioral of ring is
 begin
     process(enable, clk)
     begin
+        if (clk'event and clk = '1') then
+            if (count < 3) then
+                --前三秒使低音C使能
+                count <= count + 1;
+                enlow <= '1';
+            elsif (count = 3) then
+                --第四秒使高音C使能，低音C禁用
+                count <= count + 1;
+                enlow <= '0';
+                enhigh <= '1';
+            else
+                --第四秒后禁用低音和高音
+                enlow <= '0';
+                enhigh <= '0';
+            end if;
+        end if;
         if (enable = '1') then
             --使count初始值为0
             count <= "000";
-            if (clk'event and clk = '1') then
-                if (count < 3) then
-                    --前三秒使低音C使能
-                    count <= count + 1;
-                    enlow <= '1';
-                elsif (count = 3) then
-                    --第四秒使高音C使能，低音C禁用
-                    count <= count + 1;
-                    enlow <= '0';
-                    enhigh <= '1';
-                else
-                    --第四秒后禁用低音和高音
-                    enlow <= '0';
-                    enhigh <= '0';
-                end if;
-            end if;
         end if;
     end process;
 

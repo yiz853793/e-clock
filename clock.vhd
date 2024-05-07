@@ -10,8 +10,7 @@ entity clock is
       		 --CP2 57 IN 1KHz或100Hz
 		
 		f10: in std_logic;
-		--10Hz
-		--CP3 58
+		--CP3 58 10Hz
 		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
@@ -32,7 +31,7 @@ entity clock is
 		aset_mode: in std_logic_vector(1 downto 0);
 		--设置模式
 		--"00" 正常 "01"设置秒针 "10"设置分针 "11"设置时针
-		--swb 5 swb 6
+		--swb 5 swc 6
 
 		alr: out std_logic;
 		--蜂鸣器信号
@@ -52,7 +51,7 @@ entity clock is
 
 		light_seclbcd: out std_logic_vector(6 downto 0)
 		--秒针低四位
-		--LG1 51 50 49 48 46 45 44
+		--LG1 44 45 46 48 49 50 51
 	);
 end clock;
 
@@ -62,6 +61,7 @@ architecture clock_bh of clock is
 constant sixty : std_logic_vector(7 downto 0) := "01011001";   -- 59
 constant tw_fo : std_logic_vector(7 downto 0) := "00100011"; -- 23
 constant zero : std_logic_vector(3 downto 0) := "0000"; --0
+constant azero: std_logic_vector(3 downto 0) := "1111";
 constant low_divider: integer := 2;  -- 4分频
 
 signal myop, clr, show_alert : std_logic;
@@ -271,13 +271,13 @@ begin
 		
 
 	--显示模块
-	sec_display: num_display port map(not sec and mode(1), zero, tmp_sech, tmp_secl, light_sech, light_secl);
+	sec_display: num_display port map(not sec and mode(1), azero, tmp_sech, tmp_secl, light_sech, light_secl);
 	--显示秒针，mode(1) = '1'时调整秒针，秒针闪烁
 	
-	min_display: num_display port map(not sec and mode(2), zero, tmp_minh, tmp_minl, light_minh, light_minl);
+	min_display: num_display port map(not sec and mode(2), azero, tmp_minh, tmp_minl, light_minh, light_minl);
 	--显示分针，mode(2) = '1'时调整分针，分针闪烁
 
-	hour_display: num_display port map(not sec and mode(3), zero, tmp_hourh, tmp_hourl, light_hourh, light_hourl);
+	hour_display: num_display port map(not sec and mode(3), azero, tmp_hourh, tmp_hourl, light_hourh, light_hourl);
 	--显示时针，mode(3) = '1'时调整时针，时针闪烁
 
 	--时钟计时模块 show_alert = '0' 有效
@@ -310,7 +310,7 @@ begin
 
 	isspark <= '1' when (en_clock = '1' and mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
 	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl) else
-		mcarry and scarry;
+		mcarry and scarry and en_clock;
 	--蜂鸣器信号
 	
 	ring_alert: ring port map(isspark, sec, enlow, enhigh);

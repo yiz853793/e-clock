@@ -308,9 +308,9 @@ begin
 	ahour_incr: bcdcnt port map('0', myop, '0', (mode(3) and show_alert) & '0', tw_fo, zero, a_hourh, a_hourl, null_and_void);
 	--mode(3) = '1', show_alert = '1'，QD调整时针
 
-	isspark <= '1' when (en_clock = '1' and mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
-	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl) or (mcarry = '0' and scarry = '0' and en_clock = '1') else
-		'0';
+	isspark <= '1'  when (en_clock = '1' and mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
+	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl) else
+		scarry and mcarry and en_clock;
 	--蜂鸣器信号
 	
 	ring_alert: ring port map(isspark, sec, enlow, enhigh);

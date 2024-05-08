@@ -10,7 +10,6 @@ entity clock is
       		 --CP2 57 IN 1KHz或100Hz
 		
 		f10: in std_logic;
-		--CP3 58 10Hz
 		
 		amyop : in std_logic;
 		--调节控制信号，上升沿触发
@@ -51,7 +50,7 @@ entity clock is
 
 		light_seclbcd: out std_logic_vector(6 downto 0)
 		--秒针低四位
-		--LG1 44 45 46 48 49 50 51
+		--LG1 51 50 49 48 46 45 44
 	);
 end clock;
 
@@ -92,7 +91,7 @@ signal tmp_hourh, tmp_hourl, tmp_minh, tmp_minl, tmp_sech, tmp_secl : std_logic_
 signal scarry : std_logic;
 --秒到分的进位
 
-signal mcarry : std_logic;
+signal mcarry, true_mcarry : std_logic;
 --分到时的进位
 
 signal isspark: std_logic;
@@ -290,9 +289,11 @@ begin
 		bcdcnt port map(scarry, myop, clr, (mode(2) and not show_alert) & (mode(0) or show_alert), sixty, zero, t_minh, t_minl, mcarry);
 	--分针计时
 	--mode(2) = '1'QD调整，mode(0) = '1'sec调整
-
+	
+	true_mcarry <= mcarry when t_sech = zero and t_sech = zero and t_minh = zero and t_minl = zero else
+		'0';
 	hour_incr: 
-		bcdcnt port map(mcarry, myop, clr, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, zero, t_hourh, t_hourl, null_and_void);
+		bcdcnt port map(true_mcarry, myop, clr, (mode(3) and not show_alert) & (mode(0) or show_alert), tw_fo, zero, t_hourh, t_hourl, null_and_void);
 	--时针计时
 	--mode(3) = '1'QD调整，mode(0) = '1'sec调整
 	
@@ -308,13 +309,13 @@ begin
 	ahour_incr: bcdcnt port map('0', myop, '0', (mode(3) and show_alert) & '0', tw_fo, zero, a_hourh, a_hourl, null_and_void);
 	--mode(3) = '1', show_alert = '1'，QD调整时针
 
-	isspark <= '1'  when (en_clock = '1' and mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
-	and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl) else
-		scarry and mcarry and en_clock;
-	--蜂鸣器信号
+	isspark <= '1' when (true_mcarry = '1' and scarry = '1' and en_clock = '1') else
+		'0';
+	--蜂鸣器信号  or 
 	
 	ring_alert: ring port map(isspark, sec, enlow, enhigh);
-	-- 响铃模块
+	-- 响铃模块 (en_clock = '1' and mode(0) = '1' and t_hourh = a_hourh and t_hourl = a_hourl and t_minh = a_minh
+	-- and t_minl = a_minl and t_sech = a_sech and t_secl = a_secl)
 	
 	low_frec : dividerOfRing port map(f1k, enlow, clr, low_divider, alr1);
 	--低音

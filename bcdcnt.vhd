@@ -38,7 +38,7 @@ signal pulse: std_logic;
 begin
 --	compound: xor_gate port map(clk, QD and mode, pulse);
 	pulse <= (clk and mode(0)) or (QD and mode(1));
-	process(pulse)
+	process(pulse, clr)
 	begin
 		if(clr = '1') then
 			ll <= "0000";

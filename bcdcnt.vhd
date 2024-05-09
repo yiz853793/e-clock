@@ -13,10 +13,11 @@ entity bcdcnt is
 		--异步清零信号
 		mode : in std_logic_vector(1 downto 0);
 		--控制模式 mode(1) = '1' 用户控制
-		bcdmod : in std_logic_vector(7 downto 0);
+		bcdmod : in std_logic_vector(6 downto 0);
 		--模，秒针和分针为60，时针为24
-		zero : in std_logic_vector(3 downto 0);
-		hh, ll : inout std_logic_vector(3 downto 0);
+--		zero : in std_logic_vector(3 downto 0);
+		hh : inout std_logic_vector(2 downto 0);
+		ll : inout std_logic_vector(3 downto 0);
 		--输出的高四位和第四位
 		carry : out std_logic
 		--进位信号
@@ -40,17 +41,18 @@ begin
 	process(pulse)
 	begin
 		if(clr = '1') then
-			ll <= zero;
-			hh <= zero;
+			ll <= "0000";
+			hh <= "000";
 		elsif(pulse'event and pulse = '1') then
-			ll <= ll + 1;
 			if(ll = "1001") then
 				hh <= hh + 1;
-				ll <= zero;
+				ll <= "0000";
+			else
+				ll <= ll + 1;
 			end if;
 			if(hh & ll = bcdmod) then
-				hh <= zero;
-				ll <= zero;
+				hh <= "000";
+				ll <= "0000";
 				carry <= '1';
 			else
 				carry <= '0';

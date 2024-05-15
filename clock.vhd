@@ -20,7 +20,7 @@ entity clock is
 		--K15 63
 		
 		en_clock: in std_logic;
-		--
+		--闹钟使能端
 		--K14 64
 		
 		ashow_alert: in std_logic;
@@ -36,19 +36,17 @@ entity clock is
 		--蜂鸣器信号
 		--sparker 52
 		
-		light_hourh: out std_logic_vector(2 downto 0);
-		light_hourl: out std_logic_vector(3 downto 0);
+		light_hourh, light_hourl: out std_logic_vector(3 downto 0);
 		--时针显示
-		--LG6 22 21 20  LG5 29 28 27 25
+		--LG6 24 22 21 20  LG5 29 28 27 25
 		
-		light_minh: out std_logic_vector(2 downto 0);
-		light_minl: out std_logic_vector(3 downto 0);
+		light_minh, light_minl: out std_logic_vector(3 downto 0);
 		--分针显示
-		--LG4 33 31 30  LG3 18 17 36 35
+		--LG4 34 33 31 30  LG3 18 17 36 35
 
-		light_sech: out std_logic_vector(2 downto 0);
+		light_sech: out std_logic_vector(3 downto 0);
 		--秒针高四位
-		--LG2 40 39 37
+		--LG2 41 40 39 37
 
 		light_seclbcd: out std_logic_vector(6 downto 0)
 		--秒针低四位
@@ -164,9 +162,8 @@ component num_display is
 		numh:in std_logic_vector(2 downto 0);
 		numl: in std_logic_vector(3 downto 0);
 		--输入高四位和低四位
-		
-		dish: out std_logic_vector(2 downto 0);
-		disl: out std_logic_vector(3 downto 0)
+
+		dish, disl: out std_logic_vector(3 downto 0)
 		--输出高四位和低四位
 	);
 end component;

@@ -67,8 +67,8 @@ signal myop, clr, show_alert : std_logic;
 signal set_mode: std_logic_vector(1 downto 0);
 --防抖动
 
-signal f50 : std_logic;
---50Hz
+signal f100 : std_logic;
+--100Hz
 
 signal sec: std_logic;
 --1hz时钟信号
@@ -133,7 +133,7 @@ end component;
 component f2f is
 	port(
 		clk:in std_logic; --10kHz
-		f50:out std_logic --50Hz
+		f100:out std_logic --100Hz
 	);
 end component;
 
@@ -214,21 +214,21 @@ component dividerOfRing is
 end component;
 
 begin
-	f10k_to_50: f2f port map(f1k, f50);
+	f10k_to_50: f2f port map(f1k, f100);
 	--防抖动模块
-	QD_db: button port map(f50, amyop, myop);
+	QD_db: button port map(f100, amyop, myop);
 	--QD防抖动
 	
-	clr_db:button port map(f50, aclr, clr);
+	clr_db:button port map(f100, aclr, clr);
 	--clr防抖动
 	
-	sa_db: button port map(f50, ashow_alert, show_alert);
+	sa_db: button port map(f100, ashow_alert, show_alert);
 	--show_alert防抖动
 	
-	st_db1:button port map(f50, aset_mode(1), set_mode(1));
+	st_db1:button port map(f100, aset_mode(1), set_mode(1));
 	--mode(1)防抖动
 	
-	st_db2:button port map(f50, aset_mode(0), set_mode(0)); 
+	st_db2:button port map(f100, aset_mode(0), set_mode(0)); 
 	--mode(0)防抖动
 	
 	nsec: f2sec port map (f10, sec);
@@ -320,7 +320,7 @@ begin
 		'0';
 	--蜂鸣器信号  or 
 	
-	db : button port map (f50, aisspark, isspark);
+	db : button port map (f100, aisspark, isspark);
 	ring_alert: ring port map(isspark, sec, enlow, enhigh);
 	-- 响铃模块 
 	

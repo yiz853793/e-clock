@@ -5,12 +5,12 @@ use ieee.std_logic_unsigned.all;
 entity f2f is
 	port(
 		clk:in std_logic; --1kHz
-		f50:out std_logic --100Hz
+		f100:out std_logic --100Hz
 	);
 end f2f;
 
 architecture f2f_bh of f2f is
-signal cnt: integer range 0 to 9; --计数器，来实现消抖的关键，一般的按键的延时是在20ms左右
+signal cnt: integer range 0 to 9; --计数器，来实现消抖的关键，一般的按键的延时是在10ms左右
 begin
 	process(clk)
 	begin
@@ -20,9 +20,9 @@ begin
 				cnt <= 0;
 			end if;
 			if cnt = 0 then 
-				f50 <= '1';
+				f100 <= '1';
 			else
-				f50 <= '0';
+				f100 <= '0';
 			end if;
 		end if;
 	end process;

@@ -42,7 +42,7 @@ begin
 				enlow <= '0';
 				enhigh <= '1';
             else
-                --第四秒后禁用低音和高音
+                --第七秒后禁用低音和高音
                 enlow <= '0';
                 enhigh <= '0';
             end if;

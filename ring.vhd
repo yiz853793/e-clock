@@ -22,15 +22,25 @@ begin
     process(enable, clk)
     begin
         if (clk'event and clk = '1') then
-            if (count < 3) then
-                --前三秒使低音C使能
+			if (count < 2) then
+				--前两秒低音
+				count <= count + 1;
+				enlow <= '1';
+			elsif (count < 4) then
+				--之后两秒高音
+				count <= count + 1;
+				enlow <= '0';
+				enhigh <= '1';
+            elsif (count < 6) then
+                --之后两秒低音
                 count <= count + 1;
-                enlow <= '1';
-            elsif (count = 3) then
-                --第四秒使高音C使能，低音C禁用
+				enlow <= '1';
+                enhigh <= '0';
+            elsif (count < 7) then
+                --最后一秒高音
                 count <= count + 1;
-                enlow <= '0';
-                enhigh <= '1';
+				enlow <= '0';
+				enhigh <= '1';
             else
                 --第四秒后禁用低音和高音
                 enlow <= '0';

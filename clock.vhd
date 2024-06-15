@@ -196,6 +196,7 @@ component ring is
 		  -- 响铃使能
         clk: in std_logic;
         --1Hz时钟信号
+	enclock: in std_logic;
         enlow: out std_logic;
         --低音C使能信号，高电平有效
         enhigh: out std_logic
@@ -321,7 +322,7 @@ begin
 	--蜂鸣器信号  or 
 	
 	db : button port map (f100, aisspark, isspark);
-	ring_alert: ring port map(isspark, sec, enlow, enhigh);
+	ring_alert: ring port map(isspark, sec, en_clock, enlow, enhigh);
 	-- 响铃模块 
 	
 	low_frec : dividerOfRing port map(f1k, enlow, clr, low_divider, alr1);
